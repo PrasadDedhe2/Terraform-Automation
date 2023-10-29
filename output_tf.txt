@@ -1,0 +1,28 @@
+terraform{
+{
+backend "azurerm" {
+source = "hashicorp/azurerm"
+version  = "~> 3.10.6"
+}
+required_version = ">= 1.0.10"
+
+provider{
+features{}
+}
+}
+
+data "azurerm_resource_group" "myrg" {
+name = var.rgname
+}
+
+resource "azurerm_NIC" myNic {
+name = var.NICname
+resource_group_name = data.azurerm_resource_group.myrg.name
+location = data.azurerm_resource_group.myrg.location
+}
+
+output "NICIP" {
+ip = azurerm_NIC.myNic.public_ip
+}
+
+//You can use the value like this --> terraform output NICIP

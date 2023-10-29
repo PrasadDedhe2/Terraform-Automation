@@ -1,0 +1,46 @@
+terraform{
+backend "azurerm"{
+source = "hashicorp/azurerm"
+version = "=>3.5.3"
+}
+
+required_version = ">=1.3.2"
+
+provider "azurerm"{
+features{}
+}
+}
+
+
+// simple example
+resource "azurerm_logic_expression_apps" "LandingAreaApps" {
+count = 4
+name = "LandingAreaApp_${count.index}"
+}
+
+
+
+//complex example. In this case one should use for_each rather than count as in for_each key:value (Server0 = 10.10.10.1) is available.
+variable "subnet_ids" {
+  type = list(string)                   subnet_id = [10.10.10.1, 10.10.10.2, 10.10.10.3, 10.10.10.4]
+}
+
+resource "aws_instance" "server" {
+  # Create one instance for each subnet
+  count = length(var.subnet_ids) --> 4
+
+  ami           = "ami-a1b2c3d4"
+  instance_type = "t2.micro"
+  subnet_id     = var.subnet_ids[count.index]
+
+  tags = {
+    Name = "Server ${count.index}"
+  }
+}
+
+output:
+
+Server0 -> 10.10.10.1
+Server1 -> 10.10.10.2
+Server2 -> 10.10.10.3
+Server3 -> 10.10.10.4
